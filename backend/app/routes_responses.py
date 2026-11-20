@@ -35,7 +35,11 @@ def create_response(
     project = db.query(Project).filter(Project.id == project_id).first()
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
-
+    if user is not None and user.id == project.owner_id:
+        raise HTTPException(
+            status_code=403,
+            detail="You cannot submit feedback on your own project.",
+        )
     question = (
         db.query(Question)
         .filter(Question.project_id == project_id, Question.is_active == True)
